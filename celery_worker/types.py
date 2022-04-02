@@ -1,11 +1,17 @@
-from types import NewType, Tuple, Set
+from typing import NewType, Tuple, Set, Union, Optional, Any
 
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 
+from kombu import Producer
 
 UserId = NewType('UserId', str)
 Geolocation = NewType('Geolocation', Tuple[float, float])
+
+class RMQMessage(BaseModel):
+    checkin_time: datetime
+    geoloc: Geolocation
+
 
 class Cadence(BaseModel):
     period: timedelta
@@ -15,25 +21,32 @@ class User(BaseModel):
     userId: UserId
     approx_geolocation: Geolocation
     last_checkedin_time: datetime
-    checkin_algo: Any[Cadence, datetime]  # either decides to check in periodically or next check in is at a time
-    notifiers: Optional[Set[User]]
-    producer: Optional[Producer] = None 
+    checkin_algo: Union[Cadence, datetime]  # either decides to check in periodically or next check in is at a time
+    notifiers: Optional[Set[UserId]]
+    producer: Optional[Any] = None 
 
     @property
-    def next_checkin_time(self) -> datetime
+    def next_checkin_time(self) -> datetime:
         if self.checkin_algo.isinstance(Cadence):
             return self.last_checkedin_time + self.checkin_algo.period
         else:
             return self.checkin_algo
 
-    def add_notifier(self, notifier: User):
+    def add_notifier(self, notifier: UserId):
         self.notifiers.add(notifier)
 
-    def checkin(self, checkin_time: datetime):
-        self.last_checkedin_time = checkin_time
-
-    def set_producer(self, producer: Producer):
+    def set_producer(self, producer: Any):
         self.producer = producer
+
+    def checkin(self, checkin_time: datetime, approx_geolocation: Geolocation):
+        print('publishing...')
+        msg = RMQMessage(checkin_time=checkin_time, geoloc=approx_geolocation)
+        self.producer.publish(msg.json(), routing_key=str(self.userId)) # throws error if producer is not set
+        self.last_checkedin_time = checkin_time
+        self.approx_geolocation = approx_geolocation
+        self.producer.close()
+        print('published')
+        print(f'{msg.json()}')
 
 
 class UserChecksInEvent:
