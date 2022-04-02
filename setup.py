@@ -19,5 +19,6 @@ setup(
         "Werkzeug",
         "pydantic",
         "kombu",
+        "argparse",
     ]
 )
