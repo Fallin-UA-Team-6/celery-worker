@@ -15,7 +15,7 @@ class CheckInEventConsumer(ConsumerMixin):
     def get_consumers(self, Consumer, channel):
         return [Consumer(queues=self.queues,
                          callbacks=[self.on_message],
-                         accept=['text/json'])]
+                         accept=['text/json', 'text/plain'])]
 
     def on_message(self, body, message):
         try:

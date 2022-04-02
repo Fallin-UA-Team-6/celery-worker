@@ -39,14 +39,12 @@ class User(BaseModel):
         self.producer = producer
 
     def checkin(self, checkin_time: datetime, approx_geolocation: Geolocation):
-        print('publishing...')
         msg = RMQMessage(checkin_time=checkin_time, geoloc=approx_geolocation)
         self.producer.publish(msg.json(), routing_key=str(self.userId)) # throws error if producer is not set
         self.last_checkedin_time = checkin_time
         self.approx_geolocation = approx_geolocation
         self.producer.close()
-        print('published')
-        print(f'{msg.json()}')
+        print(f'published {msg.json()}')
 
 
 class UserChecksInEvent:
