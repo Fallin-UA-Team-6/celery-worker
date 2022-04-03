@@ -5,7 +5,7 @@ setup(
     version='1',
     python_requires='>=3.8',
     author='Brian Donald, Tejash Desai',
-    author_email='suuport@iamnotbrian.com',
+    author_email='contact@noimbrian.com',
     packages=find_namespace_packages(include=['backend']),
     long_description="implements safety-ping system for fall-in-ua hackathon",
     package_data={
@@ -19,6 +19,8 @@ setup(
         "Werkzeug",
         "pydantic",
         "kombu",
-        "argparse",
+        "celery==4.4.6",
+        "loguru",
+        "firebase_admin",
     ]
 )

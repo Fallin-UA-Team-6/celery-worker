@@ -8,9 +8,9 @@ url = os.getenv('AMQP_URL', 'amqp://localhost:5672/')
 pwd = os.getenv('RMQ_PASSWORD', 'password')
 user = os.getenv('RMQ_USER', 'username')
 
-connection = Connection(url)  # no heartbeats set yet, set using heartbeat= param
-channel = connection.channel()
-exchange = Exchange('safety-ping', type='direct')
+# connection = Connection(url)  # no heartbeats set yet, set using heartbeat= param
+# channel = connection.channel()
+# exchange = Exchange('safety-ping', type='direct')
 
 # from https://medium.com/@Skablam/talking-to-rabbitmq-with-python-and-kombu-6cbee93b1298#.r3ho2468m
 def establish_connection():

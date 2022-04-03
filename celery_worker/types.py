@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 
 from kombu import Producer
 
+from celery_worker.logger import logger
+# from celery_worker.rmq_apis import exchange
+
 UserId = NewType('UserId', str)
 Geolocation = NewType('Geolocation', Tuple[float, float])
 
@@ -40,11 +43,11 @@ class User(BaseModel):
 
     def checkin(self, checkin_time: datetime, approx_geolocation: Geolocation):
         msg = RMQMessage(checkin_time=checkin_time, geoloc=approx_geolocation)
-        self.producer.publish(msg.json(), routing_key=str(self.userId)) # throws error if producer is not set
+        self.producer.publish(msg.json(), exchange=exchange, routing_key=str(self.userId)) # throws error if producer is not set
         self.last_checkedin_time = checkin_time
         self.approx_geolocation = approx_geolocation
         self.producer.close()
-        print(f'published {msg.json()}')
+        logger.info(f'published {msg.json()}')
 
 
 class UserChecksInEvent:
