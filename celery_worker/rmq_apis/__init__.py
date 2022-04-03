@@ -2,6 +2,8 @@ import os
 
 from kombu import Connection, Exchange, Queue
 
+from celery_worker.logger import logger
+
 url = os.getenv('AMQP_URL', 'amqp://localhost:5672/')
 pwd = os.getenv('RMQ_PASSWORD', 'password')
 user = os.getenv('RMQ_USER', 'username')
@@ -17,5 +19,5 @@ def establish_connection():
     channel = revived_connection.channel()
     consumer.revive(channel)
     consumer.consume()
-    print('re-connection successful')
+    logger.info('re-connection successful')
     return revived_connection

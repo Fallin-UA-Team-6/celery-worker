@@ -6,7 +6,7 @@ from kombu import Exchange, Producer, Queue
 from celery_worker.rmq_apis import connection, channel, exchange
 
 
-def get_producer(routing_key: str) -> Producer:
+def get_producer(routing_key: Optional[str] = None) -> Producer:
     return Producer(exchange=exchange, channel=channel, routing_key=routing_key)
 
 
